@@ -2,18 +2,31 @@
 
 const DEBUG = false;
 
+// =====================================================================================================================
+
 require_once 'vendor/autoload.php';
+
 require_once 'SpotifyMusicDiscovery.php';
 require_once 'AlbumOfTheYearInterface.php';
 require_once 'MusicBrainzInterface.php';
 require_once 'AllMusicInterface.php';
 
+// =====================================================================================================================
+
 $now = new DateTime('now');
 $creator = new SpotifyMusicDiscovery();
 
+// =====================================================================================================================
+
 $creator->addAlbumInterface(new AlbumOfTheYearInterface());
-$creator->addAlbumInterface(new MusicBrainzInterface()); // can break easily for no reason..
+
+// can break easily for no reason..
+$creator->addAlbumInterface(new MusicBrainzInterface());
+
+// possible that songs from previous month come in current months' playlist
 $creator->addAlbumInterface(new AllMusicInterface());
+
+// =====================================================================================================================
 
 function UpdatePlaylist($base_name, $genres)
 {
@@ -25,6 +38,8 @@ function UpdatePlaylist($base_name, $genres)
 	$creator->setGenres($genres);
 	$creator->run();
 }
+
+// =====================================================================================================================
 
 UpdatePlaylist("Indie Rock/Pop", [
 	GENRE::INDIE_ROCK,
@@ -252,3 +267,5 @@ UpdatePlaylist("Soul", [
 	GENRE::COUNTRY_SOUL,
 	GENRE::BLUE_EYED_SOUL
 ]);
+
+// =====================================================================================================================
