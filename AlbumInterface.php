@@ -6,9 +6,7 @@ require_once 'Genre.php';
 interface AlbumInterface
 {
 	/**
-	 * @param int $year
-	 * @param int $month
-	 * @param int $day
+	 * @param DateTime $date
 	 * @param int[] $genres
 	 * @param bool $get_all
 	 * @return AlbumEntry[]
@@ -19,7 +17,7 @@ interface AlbumInterface
 	 *
 	 * Each album must contain at least one of the specified genres.
 	 */
-	public function getAllAlbums($year, $month, $day, $genres, $get_all);
+	public function getAllAlbums($date, $genres, $get_all);
 }
 
 class AlbumEntry

@@ -164,7 +164,7 @@ class SpotifyMusicDiscovery
 
 		foreach($this->album_interfaces as $album_interface)
 		{
-			$list = array_merge($list, $album_interface->getAllAlbums($this->year, $this->month, $this->day, $this->genres, $this->get_all));
+			$list = array_merge($list, $album_interface->getAllAlbums($this->date, $this->genres, $this->get_all));
 		}
 
 		return array_unique($list, SORT_REGULAR);

@@ -5,11 +5,19 @@ const DEBUG = false;
 require_once 'vendor/autoload.php';
 require_once 'SpotifyMusicDiscovery.php';
 require_once 'AlbumOfTheYearInterface.php';
+require_once 'MusicBrainzInterface.php';
 
 $now = new DateTime('now');
 $creator = new SpotifyMusicDiscovery();
 
 $creator->addAlbumInterface(new AlbumOfTheYearInterface());
+
+// MusicBrainz search sucks so hard that you randomly get 200K+ results,
+// the PHP library sucks too, can't access necessary data,
+// have to perform multiple useless requests so you hit the rate limit faster etc...
+// I tried fixing stuff but I CBA to go on with this shit,
+// but I'm leaving it in here in case someone decides to take a look
+// $creator->addAlbumInterface(new MusicBrainzInterface());
 
 function UpdatePlaylist($base_name, $genres)
 {

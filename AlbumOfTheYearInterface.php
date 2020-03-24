@@ -64,8 +64,12 @@ class AlbumOfTheYearInterface implements AlbumInterface
 		return $list;
 	}
 
-	public function getAllAlbums($year, $month, $day, $genres, $get_all)
+	public function getAllAlbums($date, $genres, $get_all)
 	{
+		$day = $date->format('j');
+		$month = $date->format('n');
+		$year = $date->format('Y');
+
 		$list = [];
 
 		foreach($genres as $genre)

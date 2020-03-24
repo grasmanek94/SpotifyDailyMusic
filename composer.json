@@ -2,6 +2,9 @@
     "require": {
         "voku/simple_html_dom": "^4.7",
         "voku/portable-utf8": "^5.4",
-        "jwilsson/spotify-web-api-php": "^3.2"
+        "jwilsson/spotify-web-api-php": "^3.2",
+        "pbxg33k/musicbrainz": "^0.3.0",
+        "guzzlehttp/guzzle": "^5.3",
+      "ext-curl": "*"
     }
 }
