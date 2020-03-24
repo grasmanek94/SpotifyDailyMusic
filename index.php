@@ -533,7 +533,7 @@ class PlaylistCreatorEntry
 	public function __construct($creator, $base_name, $date, $genres)
 	{
 		$creator->setDate($date);
-		$creator->setBaseName($base_name);
+		$creator->setBaseName($base_name . " - Daily Album Releases - by GZ0.NL");
 		$creator->setGenres($genres);
 		$creator->run();
 	}
@@ -699,20 +699,27 @@ class GENRE
 $now = new \DateTime('now');
 $creator = new SpotifyMusicDiscoveryCreator();
 
-new PlaylistCreatorEntry($creator, "Daily Album Releases - Indie Rock/Pop Music - by GZ0.NL", $now, [
+new PlaylistCreatorEntry($creator, "Indie Rock/Pop", $now, [
 	GENRE::INDIE_ROCK,
 	GENRE::INDIE_POP,
 	GENRE::ROCK,
 	GENRE::POP_ROCK
 ]);
 
-new PlaylistCreatorEntry($creator, "Daily Album Releases - Electronic / House - by GZ0.NL", $now, [
+new PlaylistCreatorEntry($creator, "Electronic / House", $now, [
 	GENRE::HOUSE,
 	GENRE::ELECTRO_HOUSE,
 	GENRE::ELECTRONIC
 ]);
 
-new PlaylistCreatorEntry($creator, "Daily Album Releases - All Rock - by GZ0.NL", $now, [
+new PlaylistCreatorEntry($creator, "EDM / Drum and Bass", $now, [
+	GENRE::EDM,
+	GENRE::DRUM_AND_BASS,
+	GENRE::FUTURE_BASS,
+	GENRE::BASS
+]);
+
+new PlaylistCreatorEntry($creator, "Rock", $now, [
 	GENRE::ROCK,
 	GENRE::ACOUSTIC_ROCK,
 	GENRE::ALTERNATIVE_ROCK,
@@ -733,7 +740,7 @@ new PlaylistCreatorEntry($creator, "Daily Album Releases - All Rock - by GZ0.NL"
 	GENRE::GOTHIC_ROCK
 ]);
 
-new PlaylistCreatorEntry($creator, "Daily Album Releases - All Pop - by GZ0.NL", $now, [
+new PlaylistCreatorEntry($creator, "Pop", $now, [
 	GENRE::POP,
 	GENRE::POP_ROCK,
 	GENRE::AMBIENT_POP,
@@ -754,7 +761,7 @@ new PlaylistCreatorEntry($creator, "Daily Album Releases - All Pop - by GZ0.NL",
 	GENRE::SYNTHPOP
 ]);
 
-new PlaylistCreatorEntry($creator, "Daily Album Releases - All Electronic - by GZ0.NL", $now, [
+new PlaylistCreatorEntry($creator, "Electronic", $now, [
 	GENRE::ELECTROPOP,
 	GENRE::ELECTRO,
 	GENRE::ELECTRONIC,
@@ -763,10 +770,11 @@ new PlaylistCreatorEntry($creator, "Daily Album Releases - All Electronic - by G
 	GENRE::ELECTRONICA,
 	GENRE::ELECTRO_INDUSTRIAL,
 	GENRE::ELECTROCLASH,
-	GENRE::ELECTROACOUSTIC
+	GENRE::ELECTROACOUSTIC,
+	GENRE::INDIETRONICA
 ]);
 
-new PlaylistCreatorEntry($creator, "Daily Album Releases - All Metal - by GZ0.NL", $now, [
+new PlaylistCreatorEntry($creator, "Metal", $now, [
 	GENRE::ALTERNATIVE_METAL,
 	GENRE::ATMOSPHERIC_BLACK_METAL,
 	GENRE::AVANT_GARDE_METAL,
@@ -784,7 +792,7 @@ new PlaylistCreatorEntry($creator, "Daily Album Releases - All Metal - by GZ0.NL
 	GENRE::INDUSTRIAL_METAL
 ]);
 
-new PlaylistCreatorEntry($creator, "Daily Album Releases - All House - by GZ0.NL", $now, [
+new PlaylistCreatorEntry($creator, "House", $now, [
 	GENRE::HOUSE,
 	GENRE::ELECTRO_HOUSE,
 	GENRE::HIP_HOUSE,
@@ -794,9 +802,126 @@ new PlaylistCreatorEntry($creator, "Daily Album Releases - All House - by GZ0.NL
 	GENRE::FRENCH_HOUSE
 ]);
 
-new PlaylistCreatorEntry($creator, "Daily Album Releases - All Industrial - by GZ0.NL", $now, [
+new PlaylistCreatorEntry($creator, "Industrial", $now, [
 	GENRE::INDUSTRIAL_METAL,
 	GENRE::INDUSTRIAL,
 	GENRE::ELECTRO_INDUSTRIAL,
 	GENRE::DEATH_INDUSTRIAL
+]);
+
+new PlaylistCreatorEntry($creator, "Dance", $now, [
+	GENRE::DANCE,
+	GENRE::ALTERNATIVE_DANCE,
+	GENRE::DANCE_PUNK,
+	GENRE::DANCE_POP,
+	GENRE::DANCE_ROCK,
+	GENRE::DANCEHALL
+]);
+
+new PlaylistCreatorEntry($creator, "Country", $now, [
+	GENRE::COUNTRY,
+	GENRE::COUNTRY_POP,
+	GENRE::COUNTRY_ROCK,
+	GENRE::COUNTRY_SOUL,
+	GENRE::ALT_COUNTRY
+]);
+
+new PlaylistCreatorEntry($creator, "Punk", $now, [
+	GENRE::DANCE_PUNK,
+	GENRE::POST_PUNK,
+	GENRE::ART_PUNK,
+	GENRE::CELTIC_PUNK,
+	GENRE::FOLK_PUNK,
+	GENRE::GARAGE_PUNK,
+	GENRE::HARDCORE_PUNK
+]);
+
+new PlaylistCreatorEntry($creator, "Funk", $now, [
+	GENRE::FUNK,
+	GENRE::FUNK_METAL,
+	GENRE::FUNK_ROCK,
+	GENRE::FUTURE_FUNK
+]);
+
+new PlaylistCreatorEntry($creator, "Techno", $now, [
+	GENRE::AMBIENT_TECHNO,
+	GENRE::DUB_TECHNO,
+	GENRE::AMBIENT_TECHNO
+]);
+
+new PlaylistCreatorEntry($creator, "DubStep", $now, [
+	GENRE::DUBSTEP
+]);
+
+new PlaylistCreatorEntry($creator, "Acid", $now, [
+	GENRE::ACID_HOUSE,
+	GENRE::ACID_JAZZ,
+	GENRE::ACID_TECHNO
+]);
+
+new PlaylistCreatorEntry($creator, "Jazz", $now, [
+	GENRE::AVANT_GARDE_JAZZ,
+	GENRE::DARK_JAZZ,
+	GENRE::ACID_JAZZ
+]);
+
+new PlaylistCreatorEntry($creator, "Hip-Hop", $now, [
+	GENRE::HIP_HOP,
+	GENRE::ABSTRACT_HIP_HOP,
+	GENRE::EXPERIMENTAL_HIP_HOP,
+	GENRE::GLITCH_HOP
+]);
+
+new PlaylistCreatorEntry($creator, "Folk", $now, [
+	GENRE::FOLK,
+	GENRE::INDIE_FOLK,
+	GENRE::FOLK_PUNK,
+	GENRE::FOLK_POP,
+	GENRE::FOLK_ROCK,
+	GENRE::CHAMBER_FOLK,
+	GENRE::AVANT_FOLK,
+	GENRE::FOLKTRONICA,
+	GENRE::FREAK_FOLK
+]);
+
+new PlaylistCreatorEntry($creator, "Experimental", $now, [
+	GENRE::EXPERIMENTAL,
+	GENRE::EXPERIMENTAL_METAL,
+	GENRE::EXPERIMENTAL_ROCK,
+	GENRE::EXPERIMENTAL_HIP_HOP
+]);
+
+new PlaylistCreatorEntry($creator, "Disco", $now, [
+	GENRE::DISCO,
+	GENRE::ELECTRO_DISCO
+]);
+
+new PlaylistCreatorEntry($creator, "Ambient", $now, [
+	GENRE::AMBIENT,
+	GENRE::DARK_AMBIENT,
+	GENRE::AMBIENT_TECHNO,
+	GENRE::AMBIENT_HOUSE,
+	GENRE::AMBIENT_POP
+]);
+
+new PlaylistCreatorEntry($creator, "Glitch", $now, [
+	GENRE::GLITCH,
+	GENRE::GLITCH_HOP,
+	GENRE::GLITCH_POP
+]);
+
+new PlaylistCreatorEntry($creator, "R&B", $now, [
+	GENRE::R_AND_B,
+	GENRE::ALTERNATIVE_R_AND_B
+]);
+
+new PlaylistCreatorEntry($creator, "Blues", $now, [
+	GENRE::BLUES,
+	GENRE::BLUES_ROCK
+]);
+
+new PlaylistCreatorEntry($creator, "Soul", $now, [
+	GENRE::SOUL,
+	GENRE::COUNTRY_SOUL,
+	GENRE::BLUE_EYED_SOUL
 ]);
