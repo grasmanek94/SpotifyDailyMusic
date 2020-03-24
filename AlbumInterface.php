@@ -12,6 +12,12 @@ interface AlbumInterface
 	 * @param int[] $genres
 	 * @param bool $get_all
 	 * @return AlbumEntry[]
+	 *
+	 * Returns a list of albums for the complete $month,
+	 * where the album release date is earlier than the provided $year-$month-$day,
+	 * unless get_all is true, then return all released albums in the whole month.
+	 *
+	 * Each album must contain at least one of the specified genres.
 	 */
 	public function getAllAlbums($year, $month, $day, $genres, $get_all);
 }
