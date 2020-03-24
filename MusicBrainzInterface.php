@@ -247,7 +247,7 @@ class MusicBrainzInterface implements AlbumInterface
 		$tags = [];
 		foreach($genres as $genre)
 		{
-			$tags[] = self::$genreMappings[$genre];
+			$tags[] = urlencode(self::$genreMappings[$genre]);
 		}
 
 		try {
