@@ -155,4 +155,7 @@ class GENRE
 	const INDIE_FOLK = 16;
 	const INDUSTRIAL = 52;
 	const INDUSTRIAL_METAL = 107;
+	const JAZZ = 35;
+	const NEW_AGE = 168;
+	const REGGAE = 81;
 }

@@ -13,7 +13,7 @@ require_once 'AlbumInterface.php';
 
 class MusicBrainzInterface implements AlbumInterface
 {
-	private static $genreMappings = [
+	private static $genre_mappings = [
 		GENRE::INDIE_ROCK => 'indie rock',
 		GENRE::HIP_HOP => 'hip hop',
 		GENRE::INDIE_POP => 'indie pop',
@@ -167,6 +167,9 @@ class MusicBrainzInterface implements AlbumInterface
 	    GENRE::INDIE_FOLK => 'indie folk',
 	    GENRE::INDUSTRIAL => 'industrial',
 	    GENRE::INDUSTRIAL_METAL => 'industrial metal',
+		GENRE::JAZZ => 'jazz',
+		GENRE::NEW_AGE => 'new age',
+		GENRE::REGGAE => 'reggae'
 	];
 
 	/**
@@ -247,7 +250,10 @@ class MusicBrainzInterface implements AlbumInterface
 		$tags = [];
 		foreach($genres as $genre)
 		{
-			$tags[] = urlencode(self::$genreMappings[$genre]);
+			if(array_key_exists($genre, self::$genre_mappings))
+			{
+				$tags[] = urlencode(self::$genre_mappings[$genre]);
+			}
 		}
 
 		try {
