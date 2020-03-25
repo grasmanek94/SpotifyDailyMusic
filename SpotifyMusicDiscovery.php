@@ -344,7 +344,7 @@ class SpotifyMusicDiscovery
 
 		foreach ($albums as $entry)
 		{
-			$query = "album:" . $entry['album'] . " artist:" . $entry['artist'] . " year:" . $this->year;
+			$query = "album:" . $entry->album . " artist:" . $entry->artist . " year:" . $this->year;
 
 			$current_offset = 0;
 			$limit = 50;
@@ -374,7 +374,7 @@ class SpotifyMusicDiscovery
 
 					foreach ($results->albums->items as $spotify_album)
 					{
-						if (self::checkAlbumNameAndArtist($spotify_album, $entry['artist'], $entry['album']))
+						if (self::checkAlbumNameAndArtist($spotify_album, $entry->artist, $entry->album))
 						{
 							$spotify_albums[] = $spotify_album->id;
 
