@@ -19,11 +19,7 @@ $creator = new SpotifyMusicDiscovery();
 // =====================================================================================================================
 
 $creator->addAlbumInterface(new AlbumOfTheYearInterface());
-
-// can break easily for no reason..
-$creator->addAlbumInterface(new MusicBrainzInterface());
-
-// possible that songs from previous month come in current months' playlist
+$creator->addAlbumInterface(new MusicBrainzInterface()); // can break easily for no reason..
 $creator->addAlbumInterface(new AllMusicInterface());
 
 // =====================================================================================================================

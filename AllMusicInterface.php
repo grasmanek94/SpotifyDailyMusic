@@ -74,6 +74,14 @@ class AllMusicInterface implements AlbumInterface
 
 	public function getAllAlbums($date, $genres, $get_all)
 	{
+		$end_of_month = new DateTime($date->format('Y-m-t'), $date->getTimezone());
+		$end_of_month->sub(new DateInterval('P7D'));
+
+		if($date > $end_of_month)
+		{
+			$date = $end_of_month;
+		}
+
 		$date_string = $date->format('Ymd');
 
 		if(!array_key_exists($date_string, self::$html_cache) || strlen(self::$html_cache[$date_string]) < 2)
