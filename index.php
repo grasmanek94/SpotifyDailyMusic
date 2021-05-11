@@ -11,6 +11,7 @@ require_once 'AlbumOfTheYearInterface.php';
 require_once 'MusicBrainzInterface.php';
 require_once 'AllMusicInterface.php';
 
+try {
 // =====================================================================================================================
 
 $now = new DateTime('now');
@@ -18,8 +19,8 @@ $creator = new SpotifyMusicDiscovery();
 
 // =====================================================================================================================
 
-$creator->addAlbumInterface(new AlbumOfTheYearInterface());
-$creator->addAlbumInterface(new MusicBrainzInterface()); // can break easily for no reason..
+//$creator->addAlbumInterface(new AlbumOfTheYearInterface());
+//$creator->addAlbumInterface(new MusicBrainzInterface()); // can break easily for no reason..
 $creator->addAlbumInterface(new AllMusicInterface());
 
 // =====================================================================================================================
@@ -265,3 +266,6 @@ UpdatePlaylist("Soul", [
 ]);
 
 // =====================================================================================================================
+} catch ( Exception $e ) {
+   var_dump( $e->getTrace() );
+}

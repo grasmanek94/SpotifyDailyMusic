@@ -56,7 +56,7 @@ class AlbumOfTheYearInterface implements AlbumInterface
 
 				if(strlen($artist) > 0 && strlen($album) > 0)
 				{
-					$list[] = new AlbumEntry($album, $artist);
+					$list[] = new AlbumEntry($album, $artist, $url);
 				}
 			}
 		}

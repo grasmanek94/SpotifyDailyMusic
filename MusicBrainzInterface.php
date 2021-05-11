@@ -275,7 +275,7 @@ class MusicBrainzInterface implements AlbumInterface
 						$artist = $data['artist-credit'][0]['name'];
 						if (strlen($album) > 0 && strlen($artist) > 0)
 						{
-							$list[] = new AlbumEntry($album, $artist);
+							$list[] = new AlbumEntry($album, $artist, "MusicBrainzInterface: " . $date . "/" . print_r($tags, true));
 						}
 					}
 				}

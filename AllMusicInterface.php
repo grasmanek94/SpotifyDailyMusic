@@ -41,7 +41,7 @@ class AllMusicInterface implements AlbumInterface
 	 * @param int $genre
 	 * @return array
 	 */
-	private function getAlbums($data, $genre)
+	private function getAlbums($data, $genre, $url)
 	{
 		if(!array_key_exists($genre, self::$genre_mappings))
 		{
@@ -62,7 +62,7 @@ class AllMusicInterface implements AlbumInterface
 
 				if(strlen($artist) > 0 && strlen($album) > 0)
 				{
-					$list[] = new AlbumEntry($album, $artist);
+					$list[] = new AlbumEntry($album, $artist, $url);
 				}
 			}
 			catch(Exception $e)
@@ -83,10 +83,10 @@ class AllMusicInterface implements AlbumInterface
 		}
 
 		$date_string = $date->format('Ymd');
+        $url = self::getUrl($date_string);
 
 		if(!array_key_exists($date_string, self::$html_cache) || strlen(self::$html_cache[$date_string]) < 2)
 		{
-			$url = self::getUrl($date_string);
 
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $url);
@@ -110,7 +110,7 @@ class AllMusicInterface implements AlbumInterface
 
 		foreach($genres as $genre)
 		{
-			$list = array_merge($list, self::getAlbums(self::$html_cache[$date_string], $genre));
+			$list = array_merge($list, self::getAlbums(self::$html_cache[$date_string], $genre, $url));
 		}
 
 		return $list;
