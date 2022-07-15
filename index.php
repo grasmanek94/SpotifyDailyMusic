@@ -11,6 +11,7 @@ require_once 'AlbumOfTheYearInterface.php';
 require_once 'MusicBrainzInterface.php';
 require_once 'AllMusicInterface.php';
 
+try {
 // =====================================================================================================================
 
 $now = new DateTime('now');
@@ -18,8 +19,8 @@ $creator = new SpotifyMusicDiscovery();
 
 // =====================================================================================================================
 
-$creator->addAlbumInterface(new AlbumOfTheYearInterface());
-$creator->addAlbumInterface(new MusicBrainzInterface()); // can break easily for no reason..
+//$creator->addAlbumInterface(new AlbumOfTheYearInterface());
+//$creator->addAlbumInterface(new MusicBrainzInterface()); // can break easily for no reason..
 $creator->addAlbumInterface(new AllMusicInterface());
 
 // =====================================================================================================================
@@ -28,7 +29,7 @@ function UpdatePlaylist($base_name, $genres)
 {
 	global $now;
 	global $creator;
-	
+
 	$creator->setDate($now);
 	$creator->setBaseName($base_name . " - Daily Album Releases - by GZ0.NL");
 	$creator->setGenres($genres);
@@ -36,19 +37,6 @@ function UpdatePlaylist($base_name, $genres)
 }
 
 // =====================================================================================================================
-
-UpdatePlaylist("Indie Rock/Pop", [
-	GENRE::INDIE_ROCK,
-	GENRE::INDIE_POP,
-	GENRE::ROCK,
-	GENRE::POP_ROCK
-]);
-
-UpdatePlaylist("Electronic / House", [
-	GENRE::HOUSE,
-	GENRE::ELECTRO_HOUSE,
-	GENRE::ELECTRONIC
-]);
 
 UpdatePlaylist("EDM / Drum and Bass", [
 	GENRE::EDM,
@@ -264,4 +252,20 @@ UpdatePlaylist("Soul", [
 	GENRE::BLUE_EYED_SOUL
 ]);
 
+UpdatePlaylist("Indie Rock/Pop", [
+	GENRE::INDIE_ROCK,
+	GENRE::INDIE_POP,
+	GENRE::ROCK,
+	GENRE::POP_ROCK
+]);
+
+UpdatePlaylist("Electronic / House", [
+	GENRE::HOUSE,
+	GENRE::ELECTRO_HOUSE,
+	GENRE::ELECTRONIC
+]);
+
 // =====================================================================================================================
+} catch ( Exception $e ) {
+   //var_dump( $e );
+}
