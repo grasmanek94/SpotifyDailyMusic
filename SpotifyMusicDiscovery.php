@@ -59,6 +59,11 @@ class SpotifyMusicDiscovery
     private $api;
 
     /**
+     * @var 
+     */
+    private $session;
+
+    /**
      * @var string
      */
     private $data_directory;
@@ -169,9 +174,11 @@ class SpotifyMusicDiscovery
 
     public function updateTokens()
     {
+        $token_file = $this->data_directory . DIRECTORY_SEPARATOR . "token.txt";
+        $refresh_file = $this->data_directory . DIRECTORY_SEPARATOR . "refresh.txt";
 
-        $access_token = $session->getAccessToken();
-        $refresh_token = $session->getRefreshToken();
+        $access_token = $this->session->getAccessToken();
+        $refresh_token = $this->session->getRefreshToken();
 
         file_put_contents($token_file, $access_token);
         file_put_contents($refresh_file, $refresh_token);
@@ -200,18 +207,18 @@ class SpotifyMusicDiscovery
         $client_secret = file_get_contents($client_secret_file);
         $redirect_uri = file_get_contents($redirect_uri_file);
 
-        $session = new Session(
+        $this->session = new Session(
             $client_id,
             $client_secret,
             $redirect_uri
         );
 
         if (strlen($access_token) > 0) {
-            $session->setAccessToken($access_token);
-            $session->setRefreshToken($refresh_token);
+            $this->session->setAccessToken($access_token);
+            $this->session->setRefreshToken($refresh_token);
         } else if (strlen($refresh_token) > 0) {
             // Or request a new access token
-            $session->refreshAccessToken($refresh_token);
+            $this->session->refreshAccessToken($refresh_token);
         } else {
             $options = [
                 'scope' => [
@@ -231,9 +238,9 @@ class SpotifyMusicDiscovery
             'auto_refresh' => true,
         ];
 
-        $this->api = new SpotifyWebAPI\SpotifyWebAPI($options, $session);
+        $this->api = new SpotifyWebAPI($options, $this->session);
 
-        updateTokens();
+        self::updateTokens();
     }
 
     private function getPlaylist()
@@ -246,7 +253,7 @@ class SpotifyMusicDiscovery
             usleep(100 * 1000);
             $playlists = $this->api->getMyPlaylists(['limit' => $limit, 'offset' => $current_offset]);
 
-			updateTokens();
+			self::updateTokens();
 
             $current_offset += $limit;
             foreach ($playlists->items as $playlist) {
@@ -266,7 +273,7 @@ class SpotifyMusicDiscovery
                 'description' => "Albums released in " . $this->release_name . " (UPDATED DAILY!) | Suggestions can be mailed to playlists@gz0.nl"
             ]);
 
-            updateTokens();
+            self::updateTokens();
 
             if (!isset($current_playlist->id)) {
                 print_r($current_playlist);
@@ -292,7 +299,7 @@ class SpotifyMusicDiscovery
                 'offset' => $current_offset
             ]);
 
-			updateTokens();
+			self::updateTokens();
 
             $current_offset += $limit;
             $total = $results->total;
@@ -347,7 +354,7 @@ class SpotifyMusicDiscovery
                         'offset' => $current_offset
                     ]);
 
-                    updateTokens();
+                    self::updateTokens();
 
                     if (DEBUG) {
                         echo("\r\n===ALBUM Searching for: ");
@@ -378,7 +385,7 @@ class SpotifyMusicDiscovery
 
                 } while ($current_offset < $total);
             } catch (Exception $e) {
-                updateTokens();
+                self::updateTokens();
                 echo("Exception occurred: " . $e->getMessage() . "\n");
             }
         }
@@ -401,7 +408,7 @@ class SpotifyMusicDiscovery
                     'offset' => $current_offset
                 ]);
 
-                updateTokens();
+                self::updateTokens();
 
                 $current_offset += $limit;
                 $total = $results->total;
@@ -448,7 +455,7 @@ class SpotifyMusicDiscovery
             usleep(100 * 1000);
             $this->api->addPlaylistTracks($playlist_id, $chunk);
 
-            updateTokens();
+            self::updateTokens();
 
             if (DEBUG) {
                 print_r($chunk);
