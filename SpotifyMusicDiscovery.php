@@ -386,7 +386,9 @@ class SpotifyMusicDiscovery
                 } while ($current_offset < $total);
             } catch (Exception $e) {
                 self::updateTokens();
-                echo("Exception occurred: " . $e->getMessage() . "\n");
+				if($e->getMessage() != "Not found.") {
+                    echo("Exception occurred: " . $e->getMessage() . "\n");
+                }
             }
         }
 
