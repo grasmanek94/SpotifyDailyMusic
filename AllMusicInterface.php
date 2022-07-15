@@ -86,7 +86,11 @@ class AllMusicInterface implements AlbumInterface
 		}
 
 		$date_string = $date->format('Ymd');
+<<<<<<< HEAD
  		$url = self::getUrl($date_string);
+=======
+        $url = self::getUrl($date_string);
+>>>>>>> be994b9d7fe7682b231a7ce7ba41558a9bbca312
 
 		if(!array_key_exists($date_string, self::$html_cache) || strlen(self::$html_cache[$date_string]) < 2)
 		{

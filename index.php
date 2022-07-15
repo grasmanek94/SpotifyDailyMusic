@@ -33,7 +33,12 @@ function UpdatePlaylist($base_name, $genres)
 	$creator->setDate($now);
 	$creator->setBaseName($base_name . " - Daily Album Releases - by GZ0.NL");
 	$creator->setGenres($genres);
-	$creator->run();
+    try {
+	    $creator->run();
+    }
+    finally {
+        $creator->updateTokens();
+    }
 }
 
 // =====================================================================================================================

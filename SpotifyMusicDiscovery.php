@@ -86,11 +86,11 @@ class SpotifyMusicDiscovery
         self::setDate($date);
         self::setBaseName($base_name);
 
-        $this->api = new SpotifyWebAPI();
         $this->data_directory = $data_directory;
 
         usleep(100 * 1000);
-        $this->api->setAccessToken(self::getAccessToken());
+
+        self::initSpotifyWebApi();
 
         $this->album_interfaces = $album_interfaces;
     }
@@ -166,7 +166,18 @@ class SpotifyMusicDiscovery
         return array_unique($list, SORT_REGULAR);
     }
 
-    private function getAccessToken()
+
+    public function updateTokens()
+    {
+
+        $access_token = $session->getAccessToken();
+        $refresh_token = $session->getRefreshToken();
+
+        file_put_contents($token_file, $access_token);
+        file_put_contents($refresh_file, $refresh_token);
+    }
+        
+    private function initSpotifyWebApi()
     {
         $code_file = $this->data_directory . DIRECTORY_SEPARATOR . "code.txt";
         $token_file = $this->data_directory . DIRECTORY_SEPARATOR . "token.txt";
@@ -195,16 +206,13 @@ class SpotifyMusicDiscovery
             $redirect_uri
         );
 
-        if (strlen($code) > 0 && strlen($access_token) <= 0) {
-            usleep(100 * 1000);
-            $session->requestAccessToken($code);
-
-            $access_token = $session->getAccessToken();
-            $refresh_token = $session->getRefreshToken();
-
-            file_put_contents($token_file, $access_token);
-            file_put_contents($refresh_file, $refresh_token);
-        } else if (strlen($code) <= 0) {
+        if (strlen($access_token) > 0) {
+            $session->setAccessToken($access_token);
+            $session->setRefreshToken($refresh_token);
+        } else if (strlen($refresh_token) > 0) {
+            // Or request a new access token
+            $session->refreshAccessToken($refresh_token);
+        } else {
             $options = [
                 'scope' => [
                     'playlist-read-collaborative',
@@ -219,16 +227,13 @@ class SpotifyMusicDiscovery
             die();
         }
 
-        usleep(100 * 1000);
-        if ($session->refreshAccessToken($refresh_token)) {
-            $access_token = $session->getAccessToken();
-            $refresh_token = $session->getRefreshToken();
+        $options = [
+            'auto_refresh' => true,
+        ];
 
-            file_put_contents($token_file, $access_token);
-            file_put_contents($refresh_file, $refresh_token);
-        }
+        $this->api = new SpotifyWebAPI\SpotifyWebAPI($options, $session);
 
-        return $access_token;
+        updateTokens();
     }
 
     private function getPlaylist()
@@ -240,6 +245,9 @@ class SpotifyMusicDiscovery
         do {
             usleep(100 * 1000);
             $playlists = $this->api->getMyPlaylists(['limit' => $limit, 'offset' => $current_offset]);
+
+			updateTokens();
+
             $current_offset += $limit;
             foreach ($playlists->items as $playlist) {
                 if (isset($playlist->name) && $playlist->name === $this->playlist_name) {
@@ -257,6 +265,8 @@ class SpotifyMusicDiscovery
                 'collaborative' => false,
                 'description' => "Albums released in " . $this->release_name . " (UPDATED DAILY!) | Suggestions can be mailed to playlists@gz0.nl"
             ]);
+
+            updateTokens();
 
             if (!isset($current_playlist->id)) {
                 print_r($current_playlist);
@@ -281,6 +291,8 @@ class SpotifyMusicDiscovery
                 'limit' => $limit,
                 'offset' => $current_offset
             ]);
+
+			updateTokens();
 
             $current_offset += $limit;
             $total = $results->total;
@@ -329,10 +341,13 @@ class SpotifyMusicDiscovery
 
                 do {
                     usleep(100 * 1000);
+					
                     $results = $this->api->search($query, "album", [
                         'limit' => $limit,
                         'offset' => $current_offset
                     ]);
+
+                    updateTokens();
 
                     if (DEBUG) {
                         echo("\r\n===ALBUM Searching for: ");
@@ -363,6 +378,7 @@ class SpotifyMusicDiscovery
 
                 } while ($current_offset < $total);
             } catch (Exception $e) {
+                updateTokens();
                 echo("Exception occurred: " . $e->getMessage() . "\n");
             }
         }
@@ -384,6 +400,8 @@ class SpotifyMusicDiscovery
                     'limit' => $limit,
                     'offset' => $current_offset
                 ]);
+
+                updateTokens();
 
                 $current_offset += $limit;
                 $total = $results->total;
@@ -429,6 +447,9 @@ class SpotifyMusicDiscovery
         foreach ($spotify_tracks_chunks as $chunk) {
             usleep(100 * 1000);
             $this->api->addPlaylistTracks($playlist_id, $chunk);
+
+            updateTokens();
+
             if (DEBUG) {
                 print_r($chunk);
             }

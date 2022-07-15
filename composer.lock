@@ -1432,5 +1432,9 @@
         "ext-curl": "*"
     },
     "platform-dev": [],
+<<<<<<< HEAD
     "plugin-api-version": "2.2.0"
+=======
+    "plugin-api-version": "2.3.0"
+>>>>>>> be994b9d7fe7682b231a7ce7ba41558a9bbca312
 }
