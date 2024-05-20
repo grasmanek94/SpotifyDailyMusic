@@ -498,6 +498,7 @@ class SpotifyMusicDiscovery
                             if (isset($spotify_track->album->name) &&
                                 isset($spotify_album->name) &&
                                 $spotify_track->album->name === $spotify_album->name) {
+
                                 if (isset($spotify_track->album->artists) && isset($spotify_album->artists)) {
                                     if (count($spotify_track->album->artists) == count($spotify_album->artists)) {
                                         $matches = 0;

@@ -11,6 +11,8 @@ require_once 'AlbumOfTheYearInterface.php';
 require_once 'MusicBrainzInterface.php';
 require_once 'AllMusicInterface.php';
 require_once 'SpotifyAlbumInterface.php';
+// https://muspy.com/api/1/releases ?
+// https://www.elportaldemusica.es/site/last/rock
 
 try {
 // =====================================================================================================================
