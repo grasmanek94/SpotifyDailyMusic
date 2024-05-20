@@ -176,6 +176,10 @@ class SpotifyMusicDiscovery
         }
     }
 
+    public function overrideGetAll(bool $get_all) {
+        $this->get_all = $get_all;
+    }
+
     private function getAllAlbums()
     {
         $list = [];
