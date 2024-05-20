@@ -371,7 +371,7 @@ class SpotifyMusicDiscovery
         $spotify_albums = [];
 
         foreach ($albums as $entry) {
-            if(isset($entry->id) && isset($entry->type) && $entry->type === 'album') {
+            if (isset($entry->id) && isset($entry->type) && $entry->type === 'album') {
                 $spotify_albums[] = $entry;
                 continue;
             }
@@ -490,21 +490,47 @@ class SpotifyMusicDiscovery
                         }
 
                         // Try to search by string name & artists
-                        if ($spotify_track->album->name === $spotify_album->name) {
-                            if (count($spotify_track->album->artists) == count($spotify_album->artists)) {
-                                $matches = 0;
-                                foreach ($spotify_track->album->artists as $track_artist) {
-                                    foreach ($spotify_album->artists as $album_artist) {
-                                        if ($track_artist->id === $album_artist->id) {
-                                            $matches += 1;
+                        try {
+                            if (isset($spotify_track->album->name) &&
+                                isset($spotify_album->name) &&
+                                $spotify_track->album->name === $spotify_album->name) {
+                                if (isset($spotify_track->album->artists) && isset($spotify_album->artists)) {
+                                    if (count($spotify_track->album->artists) == count($spotify_album->artists)) {
+                                        $matches = 0;
+                                        foreach ($spotify_track->album->artists as $track_artist) {
+                                            foreach ($spotify_album->artists as $album_artist) {
+                                                if ($track_artist->id === $album_artist->id) {
+                                                    $matches += 1;
+                                                }
+                                            }
+                                        }
+
+                                        if ($matches == count($spotify_track->album->artists)) {
+                                            return true;
                                         }
                                     }
-                                }
+                                } else if (isset($spotify_track->artists) && isset($spotify_album->artists)) {
+                                    if (count($spotify_track->artists) == count($spotify_album->artists)) {
+                                        $matches = 0;
+                                        foreach ($spotify_track->artists as $track_artist) {
+                                            foreach ($spotify_album->artists as $album_artist) {
+                                                if ($track_artist->id === $album_artist->id) {
+                                                    $matches += 1;
+                                                }
+                                            }
+                                        }
 
-                                if ($matches == count($spotify_track->album->artists)) {
-                                    return true;
+                                        if ($matches == count($spotify_track->artists)) {
+                                            return true;
+                                        }
+                                    }
+                                } else {
+                                    print_r($spotify_track);
+                                    print_r($spotify_album);
                                 }
                             }
+                        } catch (Exception $e) {
+                            print $e->getMessage();
                         }
 
                         return false;
@@ -524,7 +550,7 @@ class SpotifyMusicDiscovery
 
                         // Try to search by string name & artists
                         if ($added_album->name === $spotify_album->name) {
-                            if(count($added_album->artists) == count($spotify_album->artists)) {
+                            if (count($added_album->artists) == count($spotify_album->artists)) {
                                 $matches = 0;
                                 foreach ($added_album->artists as $track_artist) {
                                     foreach ($spotify_album->artists as $album_artist) {
