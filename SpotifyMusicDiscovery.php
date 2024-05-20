@@ -79,11 +79,11 @@ class SpotifyMusicDiscovery
      * SpotifyMusicDiscoveryCreator constructor.
      * @param string $base_name
      * @param int[] $genres
-     * @param DateTime $date
+     * @param DateTime|null $date
      * @param AlbumInterface[] $album_interfaces
      * @param string $data_directory
      */
-    public function __construct($base_name = "", $genres = [], $date = null, $album_interfaces = [], $data_directory = "data")
+    public function __construct(string $base_name = "", array $genres = [], DateTime $date = null, array $album_interfaces = [], string $data_directory = "data")
     {
         if ($date === null) {
             $date = new \DateTime('now');
@@ -101,6 +101,11 @@ class SpotifyMusicDiscovery
 
         $this->album_interfaces = $album_interfaces;
         $this->single_songs_from_albums = false;
+    }
+
+    public function getSpotifyApi(): SpotifyWebAPI
+    {
+        return $this->api;
     }
 
     public function run()
@@ -366,6 +371,11 @@ class SpotifyMusicDiscovery
         $spotify_albums = [];
 
         foreach ($albums as $entry) {
+            if(isset($entry->id) && isset($entry->type) && $entry->type === 'album') {
+                $spotify_albums[] = $entry;
+                continue;
+            }
+
             try {
                 $query = "album:" . $entry->album . " artist:" . $entry->artist . " year:" . $this->year;
 
