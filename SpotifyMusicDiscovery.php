@@ -59,7 +59,7 @@ class SpotifyMusicDiscovery
     private $api;
 
     /**
-     * @var 
+     * @var
      */
     private $session;
 
@@ -72,6 +72,8 @@ class SpotifyMusicDiscovery
      * @var AlbumInterface[]
      */
     private $album_interfaces;
+
+    private $single_songs_from_albums;
 
     /**
      * SpotifyMusicDiscoveryCreator constructor.
@@ -98,6 +100,7 @@ class SpotifyMusicDiscovery
         self::initSpotifyWebApi();
 
         $this->album_interfaces = $album_interfaces;
+        $this->single_songs_from_albums = false;
     }
 
     public function run()
@@ -125,6 +128,14 @@ class SpotifyMusicDiscovery
     public function setGenres($genres)
     {
         $this->genres = $genres;
+    }
+
+    /**
+     * @param boolean $single_songs_from_albums
+     */
+    public function setSingleSongsFromAlbums($single_songs_from_albums)
+    {
+        $this->single_songs_from_albums = $single_songs_from_albums;
     }
 
     /**
@@ -183,7 +194,7 @@ class SpotifyMusicDiscovery
         file_put_contents($token_file, $access_token);
         file_put_contents($refresh_file, $refresh_token);
     }
-        
+
     private function initSpotifyWebApi()
     {
         $code_file = $this->data_directory . DIRECTORY_SEPARATOR . "code.txt";
@@ -230,7 +241,7 @@ class SpotifyMusicDiscovery
             ];
 
             usleep(100 * 1000);
-            print_r($session->getAuthorizeUrl($options));
+            print_r($this->session->getAuthorizeUrl($options));
             die();
         }
 
@@ -253,7 +264,7 @@ class SpotifyMusicDiscovery
             usleep(100 * 1000);
             $playlists = $this->api->getMyPlaylists(['limit' => $limit, 'offset' => $current_offset]);
 
-			self::updateTokens();
+            self::updateTokens();
 
             $current_offset += $limit;
             foreach ($playlists->items as $playlist) {
@@ -266,11 +277,16 @@ class SpotifyMusicDiscovery
 
         if ($current_playlist === null) {
             usleep(100 * 1000);
-            $current_playlist = $this->api->createPlaylist([
+            $description = "Albums released in " . $this->release_name . " (UPDATED DAILY!) | Suggestions can be mailed to playlists@gz0.nl";
+            if ($this->single_songs_from_albums) {
+                $description = "Tracks randomly chosen from albums released in " . $this->release_name . " (UPDATED DAILY!). Single track per Spotify Album! | Suggestions can be mailed to playlists@gz0.nl";
+            }
+
+            $current_playlist = $this->api->createPlaylist($this->api->me()->id, [
                 'name' => $this->playlist_name,
                 'public' => true,
                 'collaborative' => false,
-                'description' => "Albums released in " . $this->release_name . " (UPDATED DAILY!) | Suggestions can be mailed to playlists@gz0.nl"
+                'description' => $description
             ]);
 
             self::updateTokens();
@@ -292,14 +308,21 @@ class SpotifyMusicDiscovery
         $limit = 50;
         $total = 0;
 
+        $fields = 'total, items(track(id, name, type, album(id, name), artists(id, name)))';
+        if (!$this->single_songs_from_albums) {
+            $fields = 'total, items(track(id))';
+        }
+
         do {
             usleep(100 * 1000);
+
             $results = $this->api->getPlaylistTracks($current_playlist_id, [
                 'limit' => $limit,
-                'offset' => $current_offset
+                'offset' => $current_offset,
+                'fields' => $fields
             ]);
 
-			self::updateTokens();
+            self::updateTokens();
 
             $current_offset += $limit;
             $total = $results->total;
@@ -307,7 +330,11 @@ class SpotifyMusicDiscovery
             if (isset($results->items)) {
                 foreach ($results->items as $spotify_item) {
                     if (isset($spotify_item->track->id)) {
-                        $spotify_playlist_tracks[] = trim($spotify_item->track->id);
+                        if ($this->single_songs_from_albums) {
+                            $spotify_playlist_tracks[] = $spotify_item->track;
+                        } else {
+                            $spotify_playlist_tracks[] = trim($spotify_item->track->id);
+                        }
                     }
                 }
             }
@@ -348,7 +375,7 @@ class SpotifyMusicDiscovery
 
                 do {
                     usleep(100 * 1000);
-					
+
                     $results = $this->api->search($query, "album", [
                         'limit' => $limit,
                         'offset' => $current_offset
@@ -370,7 +397,7 @@ class SpotifyMusicDiscovery
 
                         foreach ($results->albums->items as $spotify_album) {
                             if (self::checkAlbumNameAndArtist($spotify_album, $entry->artist, $entry->album)) {
-                                $spotify_albums[] = $spotify_album->id;
+                                $spotify_albums[] = $spotify_album;
 
                                 if (DEBUG) {
                                     print_r($spotify_album);
@@ -386,7 +413,7 @@ class SpotifyMusicDiscovery
                 } while ($current_offset < $total);
             } catch (Exception $e) {
                 self::updateTokens();
-				if($e->getMessage() != "Not found.") {
+                if ($e->getMessage() != "Not found.") {
                     echo("Exception occurred: " . $e->getMessage() . "\n");
                 }
             }
@@ -398,14 +425,16 @@ class SpotifyMusicDiscovery
     private function getNewSpotifyTracks($spotify_albums, $spotify_playlist_tracks)
     {
         $spotify_tracks = [];
+        $already_added_albums = [];
 
         foreach ($spotify_albums as $spotify_album) {
             $current_offset = 0;
             $limit = 50;
+
             $total = 0;
             do {
                 usleep(100 * 1000);
-                $results = $this->api->getAlbumTracks($spotify_album, [
+                $results = $this->api->getAlbumTracks($spotify_album->id, [
                     'limit' => $limit,
                     'offset' => $current_offset
                 ]);
@@ -417,21 +446,110 @@ class SpotifyMusicDiscovery
 
                 if (DEBUG) {
                     echo("\r\n===TRACKS Spotify Album ID: ");
-                    print_r($spotify_album);
+                    print_r($spotify_album->id);
                     echo("\r\n");
                 }
 
-                foreach ($results->items as $spotify_track) {
-                    if (isset($spotify_track->id) &&
-                        isset($spotify_track->type) &&
-                        $spotify_track->type === 'track' &&
-                        !in_array(trim($spotify_track->id), $spotify_playlist_tracks) &&
-                        !in_array(trim($spotify_track->id), $spotify_tracks)
-                    ) {
-                        $spotify_tracks[] = trim($spotify_track->id);
+                if (!$this->single_songs_from_albums) {
+                    foreach ($results->items as $spotify_track) {
+                        if (isset($spotify_track->id) &&
+                            isset($spotify_track->type) &&
+                            $spotify_track->type === 'track' &&
+                            !in_array(trim($spotify_track->id), $spotify_playlist_tracks) &&
+                            !in_array(trim($spotify_track->id), $spotify_tracks)
+                        ) {
+                            $spotify_tracks[] = trim($spotify_track->id);
 
-                        if (DEBUG) {
-                            print_r($spotify_track);
+                            if (DEBUG) {
+                                print_r($spotify_track);
+                            }
+                        }
+                    }
+                } else {
+                    $has_already_album_track = count(array_filter($spotify_playlist_tracks, function ($spotify_track) use ($spotify_album) {
+                        $check_a = isset($spotify_track->id) &&
+                            isset($spotify_track->type) &&
+                            $spotify_track->type === 'track';
+
+                        if (!$check_a) {
+                            return false;
+                        }
+
+                        if ($spotify_track->album->id === $spotify_album->id) {
+                            return true;
+                        }
+
+                        // Try to search by string name & artists
+                        if ($spotify_track->album->name === $spotify_album->name) {
+                            if (count($spotify_track->album->artists) == count($spotify_album->artists)) {
+                                $matches = 0;
+                                foreach ($spotify_track->album->artists as $track_artist) {
+                                    foreach ($spotify_album->artists as $album_artist) {
+                                        if ($track_artist->id === $album_artist->id) {
+                                            $matches += 1;
+                                        }
+                                    }
+                                }
+
+                                if ($matches == count($spotify_track->album->artists)) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        return false;
+                    }));
+
+                    $has_already_added_album_now = count(array_filter($already_added_albums, function ($added_album) use ($spotify_album) {
+                        $check_a = isset($added_album->id) &&
+                            isset($spotify_album->id);
+
+                        if (!$check_a) {
+                            return false;
+                        }
+
+                        if ($added_album->id === $spotify_album->id) {
+                            return true;
+                        }
+
+                        // Try to search by string name & artists
+                        if ($added_album->name === $spotify_album->name) {
+                            if(count($added_album->artists) == count($spotify_album->artists)) {
+                                $matches = 0;
+                                foreach ($added_album->artists as $track_artist) {
+                                    foreach ($spotify_album->artists as $album_artist) {
+                                        if ($track_artist->id === $album_artist->id) {
+                                            $matches += 1;
+                                        }
+                                    }
+                                }
+
+                                if ($matches == count($added_album->artists)) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        return false;
+                    }));
+
+                    if ($has_already_album_track > 0 || $has_already_added_album_now > 0) {
+                        $current_offset = $total; // exit loop
+                    } else {
+                        $valid_album_songs = array_filter($results->items, function ($spotify_track) {
+                            return isset($spotify_track->id) &&
+                                isset($spotify_track->type) &&
+                                $spotify_track->type === 'track';
+                        });
+
+                        if (count($valid_album_songs) > 0) {
+                            $current_offset = $total; // exit loop
+
+                            $rand_key = array_rand($valid_album_songs, 1);
+                            $random_chosen_track = $valid_album_songs[$rand_key];
+
+                            $already_added_albums[] = $spotify_album;
+                            $spotify_tracks[] = trim($random_chosen_track->id);
                         }
                     }
                 }
