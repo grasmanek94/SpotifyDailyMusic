@@ -44,7 +44,7 @@ function UpdatePlaylist($base_name, $genres, $single_songs_from_albums = false)
 
 // =====================================================================================================================
 
-/*UpdatePlaylist("EDM / Drum and Bass", [
+UpdatePlaylist("EDM / Drum and Bass", [
     GENRE::EDM,
     GENRE::DRUM_AND_BASS,
     GENRE::FUTURE_BASS,
@@ -269,7 +269,7 @@ UpdatePlaylist("Electronic / House", [
     GENRE::HOUSE,
     GENRE::ELECTRO_HOUSE,
     GENRE::ELECTRONIC
-]);*/
+]);
 
 UpdatePlaylist("Song Discovery", [
     GENRE::HOUSE,
